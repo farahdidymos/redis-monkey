@@ -13,6 +13,7 @@ import paramiko
 import redis
 import logging
 
+
 class RedisInfo(object):
     """
     redis info
@@ -90,6 +91,7 @@ class RedisInfo(object):
             if RETRY_TIMES > 0:
                 RETRY_TIMES = RETRY_TIMES - 1
                 self.redis_connection_init()
+
     def _auth_init_from_env(self):
         # redis auth info
         self.host = str(os.environ['REDIS_ADDRESS'])
@@ -105,6 +107,49 @@ class RedisInfo(object):
     def state(f):
         format_unit = f"{f:.2f}"
         return format_unit
+
+    @staticmethod
+    def get_cpu():
+        # system cpu info
+        num = 0
+        with open('/proc/cpuinfo') as fd:
+            for line in fd:
+                if line.startswith('processor'):
+                    num += 1
+                if line.startswith('model name'):
+                    cpu_model = line.split(':')[1].strip().split()
+                    cpu_model = cpu_model[0] + ' ' + cpu_model[2] + ' ' + cpu_model[-1]
+        cpu_info = f"CPU : cpu_num : {num}   cpu_model : {cpu_model}"
+        return cpu_info
+
+    @staticmethod
+    def get_memory():
+        # system memory info
+        #   kb : return GB
+        with open('/proc/meminfo') as fd:
+            for line in fd:
+                if line.startswith('MemTotal'):
+                    mem = int(line.split()[1].strip())
+                    break
+
+        mem_info = f'MemTotal: {mem / 1024 / 1024 :.2f} GB'
+        return mem_info
+
+    def get_qps_tps(self):
+        # tps  total_commands_processed : <Sampling interval>
+        # https://github.com/me115/cppset/blob/master/redisTPS/main.cpp
+
+        sec_start = time.time()
+        cmd_num_start = self.rdb_info()['total_commands_processed']
+        time.sleep(1)
+        sec_end = time.time()
+        info = self.rdb_info()
+        cmd_num_end = info['total_commands_processed']
+        qps = info['instantaneous_ops_per_sec']
+
+        tps = (cmd_num_end - cmd_num_start) / (sec_end-sec_start)
+
+        return qps, tps
 
     def log_show(self):
         #  log process
