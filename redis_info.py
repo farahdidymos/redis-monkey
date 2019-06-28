@@ -11,13 +11,15 @@ import time
 
 import paramiko
 import redis
-
+import logging
 
 class RedisInfo(object):
     """
     redis info
 
     """
+
+    RETRY_TIMES = 3
 
     INFO_KEY = [
 
@@ -77,10 +79,17 @@ class RedisInfo(object):
 
     def redis_connection_init(self):
         # connection init
-        pool = redis.ConnectionPool(host=self.host, port=self.port, db=0,
-                                    password=self.password)
-        self._redis_client = redis.Redis(connection_pool=pool)
-
+        try:
+            pool = redis.ConnectionPool(host=self.host, port=self.port, db=0,
+                                        password=self.password)
+            self._redis_client = redis.Redis(connection_pool=pool)
+            RETRY_TIMES = 3
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            if RETRY_TIMES > 0:
+                RETRY_TIMES = RETRY_TIMES - 1
+                self.redis_connection_init()
     def _auth_init_from_env(self):
         # redis auth info
         self.host = str(os.environ['REDIS_ADDRESS'])
