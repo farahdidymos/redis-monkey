@@ -1,0 +1,5 @@
+---
+- hosts: demo
+  gather_facts: False
+  tasks:
+  - import_tasks: tasks/action/stop_redis.yaml

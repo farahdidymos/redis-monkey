@@ -1,0 +1,7 @@
+---
+- name: ReStart Redis
+  shell: |
+    #!/bin/bash
+    echo "restarting redis server..."
+    redis-cli  -p 6379 -a 123123 shutdown
+    redis-server  /data/redis.conf

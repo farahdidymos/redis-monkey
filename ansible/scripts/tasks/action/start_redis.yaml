@@ -1,0 +1,6 @@
+---
+- name: Start Redis
+  shell: |
+    #!/bin/bash
+    echo "starting redis server..."
+    redis-server  /data/redis.conf

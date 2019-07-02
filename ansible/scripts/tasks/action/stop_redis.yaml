@@ -1,0 +1,10 @@
+---
+- name: Stop Redis
+  shell: |
+    #!/bin/bash
+    echo "stopping redis server..."
+    redis-cli  -p 6379 -a 123123 shutdown
+
+
+
+
