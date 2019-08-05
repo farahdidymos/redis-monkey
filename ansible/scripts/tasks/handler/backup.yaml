@@ -1,0 +1,8 @@
+---
+- name: upload to s3
+  vars:
+    backupSize: 0
+  shell: |
+    #!/bin/bash
+    s3cmd -v  --signature-v2 put 本地文件名 s3://路径
+

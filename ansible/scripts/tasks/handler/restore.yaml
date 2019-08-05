@@ -1,0 +1,6 @@
+---
+- name: restore redis
+  shell: |
+    #!/bin/bash
+    echo "restore redis"
+    s3cmd -v --signature-v2 get s3://路径名/文件名 本地的文件名 --force

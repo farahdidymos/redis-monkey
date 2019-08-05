@@ -1,0 +1,10 @@
+---
+- hosts: vm
+  gather_facts: False
+  remote_user: root
+  tasks:
+  - import_tasks: tasks/init/initS3Config.yaml
+  - import_tasks: tasks/action/stop_redis.yaml
+  - import_tasks: handlers/restore.yaml
+  - import_tasks: tasks/action/start_redis.yaml
+
