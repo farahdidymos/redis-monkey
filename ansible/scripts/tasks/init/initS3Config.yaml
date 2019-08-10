@@ -1,0 +1,9 @@
+---
+- name: touch .s3cfg
+  template:
+    src: s3.s3cfg.txt.j2
+    dest: /root/.s3cfg
+    owner: root
+    group: root
+    mode: 0644
+
