@@ -223,6 +223,26 @@ class RedisInfo(object):
 
         return qps, tps
 
+    def alive_check(self):
+        # 检测 redis进程是否存活, pid文件是否存在或者 process是否存活
+
+        if os.path.exists(self.pid_file_path):
+            pid = int(open(self.pid_file_path).readline().strip())
+
+            if psutil.pid_exists(pid):
+                rss = self.process_mem()
+                # 获取redis进程的内存使用大小
+                self.mem_redis_server = float_format(bt_to_mb(rss)/1024)
+                self.monitor_graph_used_memory = rss
+                self.redis_alive = True
+                return True
+            else:
+                self.redis_alive = False
+                return False
+        else:
+            self.redis_alive = False
+            return False
+
     def log_show(self):
         #  log process
         pass
