@@ -170,6 +170,39 @@ class RedisInfo(object):
         # process monitor info
         self.process_disk_info(disks_info)
 
+    def proc_net_dev(self):
+        """
+        内(外) 网络 带宽及包量信息获取
+            redis部署环境中: 网卡名固定
+            'eth0' 外网
+            'eth1' 内网
+        信息获取文件 /proc/net/dev
+            最左边的表示接口的名字，Receive表示收包，Transmit表示发包
+            bytes表示收发的字节数； packets表示收发正确的包量；errs表示收发错误的包量；drop表示收发丢弃的包量；
+        :return:
+        """
+
+        with open('/proc/net/dev') as fd:
+
+            for line in fd.readlines()[2:]:
+                line = line.strip()
+                if line:
+                    line = re.split(r'[\s]+', line, flags=re.M)
+                    # print(line)
+                    assert len(line) > 16    # 有些系统记录不同
+                    net_dev = line[0].rstrip(':')
+
+                    if net_dev == 'lo':    # ignore 'lo'
+                        continue
+                    net_info = (bt_to_mb(line[1]),
+                                sum(map(int, line[2:9])),
+                                bt_to_mb(line[9]),
+                                sum(map(int, line[10:17])))
+
+                    # process monitor info
+                    self.process_net_info(net_dev, net_info)
+
+
     def process_disk_info(self, new_disks_info):
         """
         calculate && update the monitor information of disks
