@@ -276,6 +276,25 @@ class RedisInfo(object):
             self.redis_alive = False
             return False
 
+    def process_monitor_graph_data(self):
+
+        try:
+            conn = self.redis_local_connect()
+            keyspace =  conn.info("keyspace")
+            if "db0" in keyspace:
+                self.monitor_graph_total_keys = keyspace["db0"]["keys"]
+            self.monitor_graph_connected_clients = conn.info("clients")["connected_clients"]
+            self.monitor_graph_instantaneous_net_input = conn.info("stats")["instantaneous_input_kbps"]
+            self.monitor_graph_instantaneous_net_output = conn.info("stats")["instantaneous_output_kbps"]
+            keyspace_hits = conn.info("stats")["keyspace_hits"]
+            keyspace_misses = conn.info("stats")["keyspace_misses"]
+            self.monitor_graph_keyspace_hits = keyspace_hits
+            latency = subprocess.getoutput("redis-cli -p {{ redisServerPort }} --latency --raw")
+            self.monitor_graph_max_latency = int(str.split(latency)[1])
+        except BaseException as e:
+            traceback.print_exc()
+            
+
     def log_show(self):
         #  log process
         pass
