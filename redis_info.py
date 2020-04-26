@@ -170,6 +170,38 @@ class RedisInfo(object):
         # process monitor info
         self.process_disk_info(disks_info)
 
+    def redis_benchmark():
+    # redis benchmark test commands
+    # info store
+
+    with codecs.open('redis_benchmark_test.csv', 
+                     'w', encoding = 'utf-8-sig', errors = 'ignore')as f:
+
+        csv_writer = csv.writer(f)
+
+        pinfo = platform_info()
+
+        cpu_info = get_cpu()
+        mem_info = get_memory()
+        csv_writer.writerow((pinfo, ))
+        csv_writer.writerow([cpu_info, ])
+        csv_writer.writerow([mem_info, ])
+        csv_writer.writerow(headers_line)
+
+        global scmds_benchmark_str
+
+        for index, (c, n, r, P)in enumerate(bh_vars_list):
+
+            cmd = scmds_benchmark_str.format(
+                scmd = scmd, c = c, n = n, r = r, P = P)
+
+            re_lst = [c, n, r, P]
+            re_lst.extend(redis_benchmark_cmd(cmd))
+            if re_lst:
+                re_lst.insert(0, f"{index})")
+                csv_writer.writerow(re_lst)
+
+
     def proc_net_dev(self):
         """
         内(外) 网络 带宽及包量信息获取
