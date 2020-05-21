@@ -1,0 +1,9 @@
+---
+- name: ifExistRedisServer
+  shell: |
+    #!/bin/bash
+    #master节点
+    # 登录客户端
+    redis-cli -h {{ redis_repl_master }} -p {{ redisServerPort }} -a {{ password }} info
+    redis-cli -h {{ redis_repl_slave }} -p {{ redisServerPort }} -a {{ password }} info
+
