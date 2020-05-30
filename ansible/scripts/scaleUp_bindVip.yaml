@@ -1,0 +1,7 @@
+---
+# This Playbook would bindVIP.
+
+- hosts: vm
+  gather_facts: False
+  tasks:
+    - import_tasks: tasks/action/scaleUpBindVIP.yaml
