@@ -1,0 +1,5 @@
+---
+- name: flushall
+  shell: |
+    #!/bin/bash
+    redis-cli -p 6379 -a 123123 flushall async
